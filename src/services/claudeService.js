@@ -1,12 +1,8 @@
 // Services for Claude API Integration
 // Model: claude-sonnet-4-5-20250929
 
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.REACT_APP_CLAUDE_API_KEY,
-  dangerouslyAllowBrowser: true, // Note: For demo purposes only. In production, use a backend API.
-});
+// Backend API URL - use environment variable or default to localhost
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 /**
  * Analyze job market data to identify emerging roles, declining roles, and trends
@@ -15,12 +11,15 @@ const anthropic = new Anthropic({
  */
 export const analyzeJobMarket = async (csvData) => {
   try {
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 16000,
-      messages: [{
-        role: "user",
-        content: `You are a job market analyst. Analyze these job postings and identify trends:
+    const response = await fetch(`${API_URL}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 16000,
+        messages: [{
+          role: "user",
+          content: `You are a job market analyst. Analyze these job postings and identify trends:
 
 ${csvData}
 
@@ -55,9 +54,17 @@ Focus on:
 2. New skill combinations that didn't exist 2 years ago
 3. How AI is transforming traditional roles
 4. Realistic salary ranges based on the data`
-      }]
+        }]
+      })
     });
-    
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || error.error || 'API request failed');
+    }
+
+    const message = await response.json();
+
     // Parse the response
     const responseText = message.content[0].text;
     
@@ -82,12 +89,15 @@ Focus on:
  */
 export const matchUserToRoles = async (userBackground, marketAnalysis) => {
   try {
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 8000,
-      messages: [{
-        role: "user",
-        content: `User background:
+    const response = await fetch(`${API_URL}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 8000,
+        messages: [{
+          role: "user",
+          content: `User background:
 ${userBackground}
 
 Emerging roles identified:
@@ -133,9 +143,17 @@ Return ONLY valid JSON (no markdown):
     "Potential challenges to be aware of"
   ]
 }`
-      }]
+        }]
+      })
     });
-    
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || error.error || 'API request failed');
+    }
+
+    const message = await response.json();
+
     const responseText = message.content[0].text;
     const jsonText = responseText
       .replace(/```json\n?/g, '')

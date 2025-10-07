@@ -1,5 +1,5 @@
 {
-  "name": "temp-app",
+  "name": "futureshift",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,7 +10,9 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "autoprefixer": "^10.4.21",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "express": "^4.21.2",
     "mammoth": "^1.11.0",
     "pdfjs-dist": "^3.11.174",
     "postcss": "^8.5.6",
@@ -25,7 +27,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "node server/index.js",
+    "dev": "npm run server & npm start"
   },
   "eslintConfig": {
     "extends": [

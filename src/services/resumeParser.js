@@ -1,14 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
-import Anthropic from '@anthropic-ai/sdk';
 
 // Set up the worker for PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const anthropic = new Anthropic({
-  apiKey: process.env.REACT_APP_CLAUDE_API_KEY,
-  dangerouslyAllowBrowser: true
-});
+// Backend API URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 /**
  * Extract text from PDF or DOCX resume files
@@ -97,34 +94,19 @@ const cleanResumeText = (text) => {
  */
 const reformatWithClaude = async (rawText) => {
   try {
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022', // Cheaper model for text reformatting
-      max_tokens: 2000, // Reduced tokens - career summaries are typically shorter
-      messages: [
-        {
-          role: 'user',
-          content: `You are a career profile formatter. I have extracted text from a resume or LinkedIn PDF, but the formatting is messy with odd line breaks and spacing.
-
-Here is the raw extracted text:
-
-${rawText}
-
-Please reformat this into a clean, professional career background summary that includes:
-- Current role and company
-- Years of experience
-- Key skills and expertise areas
-- Notable previous roles (2-4 most relevant)
-- Education
-- Certifications or achievements
-
-Format this as a natural, flowing paragraph (or 2-3 short paragraphs) that reads well and captures the person's professional journey. Make it feel like how someone would describe themselves professionally.
-
-IMPORTANT: Return ONLY the formatted career summary. Do not add any preamble, notes, or explanations.`
-        }
-      ]
+    const response = await fetch(`${API_URL}/api/parse-resume`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText: rawText })
     });
 
-    return message.content[0].text.trim();
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || error.error || 'Resume parsing failed');
+    }
+
+    const data = await response.json();
+    return data.parsed?.summary || cleanResumeText(rawText);
   } catch (error) {
     console.error('Claude reformatting error:', error);
     // Fall back to the cleaned raw text if Claude fails

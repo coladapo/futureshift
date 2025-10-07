@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import LandingPage from './components/LandingPage';
 import InputScreen from './components/InputScreen';
 import ResultsDashboard from './components/ResultsDashboard';
@@ -141,7 +142,9 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <>
+      <Analytics />
+      <div className="app">
       {/* Auth/User menu - shown on all screens except loading */}
       {screen !== 'loading' && (
         <>
@@ -289,6 +292,7 @@ function App() {
         />
       )}
     </div>
+    </>
   );
 }
 

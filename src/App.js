@@ -55,16 +55,9 @@ function App() {
 
       // Handle sign out
       if (event === 'SIGNED_OUT') {
-        console.log('👋 User signed out, resetting app state');
-        showToast('Signed out successfully', 'success');
-        setUser(null);
-        setScreen('landing');
-        hasMigrated.current = false;
-
-        // Wait for toast to show, then reload
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
+        console.log('👋 User signed out event received');
+        // Don't do anything here - handleSignOut already handles everything
+        // This event is just informational
       }
     });
 
@@ -106,28 +99,30 @@ function App() {
 
   const handleSignOut = async () => {
     console.log('🚪 Signing out...');
-    try {
-      // Sign out from Supabase (this will trigger SIGNED_OUT event)
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('❌ Sign out error:', error);
-        // If error is "Auth session missing", it's already signed out
-        if (!error.message.includes('session missing')) {
-          throw error;
-        }
-      }
 
-      console.log('✅ Signed out successfully');
-      // Don't reload - let the SIGNED_OUT event handler do it
-      // This prevents race conditions
+    // Show toast immediately
+    showToast('Signed out successfully', 'success');
+
+    try {
+      // Try to sign out from Supabase, but don't block if it fails
+      await supabase.auth.signOut({ scope: 'local' });
     } catch (error) {
-      console.error('❌ Sign out failed:', error);
-      // Force clear and reload as fallback
-      setUser(null);
-      setScreen('landing');
-      localStorage.clear(); // Clear all localStorage
-      window.location.href = '/'; // Hard redirect to root
+      // Ignore errors - we'll force clear anyway
+      console.log('Sign out API call failed (will clear locally):', error);
     }
+
+    // Force clear everything and reload
+    setUser(null);
+    setScreen('landing');
+    hasMigrated.current = false;
+
+    // Clear localStorage
+    localStorage.clear();
+
+    // Wait for toast to show, then hard reload
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
   };
 
   const handleLoadAnalysis = (analysis) => {

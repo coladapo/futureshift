@@ -102,17 +102,32 @@ function App() {
   const handleSignOut = async () => {
     console.log('🚪 Signing out...');
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('❌ Sign out error:', error);
-        throw error;
+      // Check if there's an active session
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // Session exists, sign out normally
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('❌ Sign out error:', error);
+          throw error;
+        }
+      } else {
+        // No active session, just clear local state
+        console.log('ℹ️ No active session, clearing local state');
       }
+
       console.log('✅ Signed out successfully');
-      // Force page reload to clear all state
+      // Clear state and reload
+      setUser(null);
+      setScreen('landing');
       window.location.reload();
     } catch (error) {
       console.error('❌ Sign out failed:', error);
-      alert('Failed to sign out: ' + error.message);
+      // Even if sign out fails, clear local state and reload
+      setUser(null);
+      setScreen('landing');
+      window.location.reload();
     }
   };
 

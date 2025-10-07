@@ -17,6 +17,17 @@ const ResultsDashboard = ({ matchResults, marketAnalysis, analysisId, onAnalyzeA
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={onAnalyzeAgain}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Analysis
+        </button>
+
         {/* Header */}
         <div className="text-center mb-12 fade-in">
           <div className="inline-flex items-center gap-2 glass-badge mb-4">

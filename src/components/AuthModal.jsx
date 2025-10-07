@@ -26,7 +26,13 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          // Handle rate limiting specifically
+          if (error.status === 429 || error.message.includes('Too Many Requests') || error.message.includes('rate limit')) {
+            throw new Error('Too many signup attempts. Please wait a few minutes and try again.');
+          }
+          throw error;
+        }
 
         if (data.user && !data.session) {
           // Email confirmation required

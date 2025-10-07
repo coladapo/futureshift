@@ -40,7 +40,7 @@ function App() {
 
       // Handle sign in
       if (event === 'SIGNED_IN') {
-        showToast('Welcome back! 👋', 'success');
+        showToast('Welcome back!', 'success');
 
         // Migrate anonymous data (for OAuth and email confirmation)
         if (session?.user && !hasMigrated.current && hasAnonymousData()) {

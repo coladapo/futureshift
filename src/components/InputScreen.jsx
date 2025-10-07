@@ -99,7 +99,6 @@ const InputScreen = ({ onAnalyze }) => {
               {/* Sample Pills - Only show when textarea is empty */}
               {!background && (
                 <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 items-center">
-                  <span className="text-xs text-gray-500">Or try a sample:</span>
                   {samplePersonas.map((persona, index) => (
                     <button
                       key={index}

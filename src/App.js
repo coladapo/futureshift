@@ -122,18 +122,18 @@ function App() {
     <div className="app">
       {/* Auth/User menu - shown on all screens except loading */}
       {screen !== 'loading' && (
-        <div className="fixed top-4 right-4 z-40 flex items-center gap-3">
+        <div className="fixed top-4 right-4 z-40 flex flex-col md:flex-row items-end md:items-center gap-2">
           {user ? (
             <>
               <button
                 onClick={() => setShowHistory(true)}
-                className="glass-button"
+                className="glass-button text-sm px-4 py-2"
               >
                 My Analyses
               </button>
               <button
                 onClick={handleSignOut}
-                className="glass-button"
+                className="glass-button text-sm px-4 py-2"
               >
                 Sign Out
               </button>
@@ -141,7 +141,7 @@ function App() {
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="glass-button-primary px-6 py-2"
+              className="glass-button-primary text-sm px-4 py-2"
             >
               Get Started
             </button>

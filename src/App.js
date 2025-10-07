@@ -15,6 +15,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { analyze, results, error, loadResults, progress } = useClaudeAnalysis();
   const hasMigrated = useRef(false); // Track if we've already migrated
 
@@ -122,31 +123,89 @@ function App() {
     <div className="app">
       {/* Auth/User menu - shown on all screens except loading */}
       {screen !== 'loading' && (
-        <div className="fixed top-4 right-4 z-40 flex flex-col md:flex-row items-end md:items-center gap-2">
-          {user ? (
-            <>
+        <>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex fixed top-4 right-4 z-40 items-center gap-3">
+            {user ? (
+              <>
+                <button
+                  onClick={() => setShowHistory(true)}
+                  className="glass-button"
+                >
+                  My Analyses
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="glass-button"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
               <button
-                onClick={() => setShowHistory(true)}
-                className="glass-button text-sm px-4 py-2"
+                onClick={() => setShowAuthModal(true)}
+                className="glass-button-primary px-6 py-2"
               >
-                My Analyses
+                Get Started
               </button>
-              <button
-                onClick={handleSignOut}
-                className="glass-button text-sm px-4 py-2"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
+            )}
+          </div>
+
+          {/* Mobile Navigation - Hamburger Menu */}
+          <div className="md:hidden fixed top-4 right-4 z-40">
             <button
-              onClick={() => setShowAuthModal(true)}
-              className="glass-button-primary text-sm px-4 py-2"
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="glass-button p-2"
+              aria-label="Menu"
             >
-              Get Started
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {showMobileMenu ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
-          )}
-        </div>
+
+            {/* Mobile Menu Dropdown */}
+            {showMobileMenu && (
+              <div className="absolute top-12 right-0 glass-card p-4 min-w-[160px]">
+                {user ? (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        setShowHistory(true);
+                        setShowMobileMenu(false);
+                      }}
+                      className="glass-button w-full text-sm px-4 py-2"
+                    >
+                      My Analyses
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleSignOut();
+                        setShowMobileMenu(false);
+                      }}
+                      className="glass-button w-full text-sm px-4 py-2"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setShowAuthModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="glass-button-primary w-full text-sm px-4 py-2"
+                  >
+                    Get Started
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {screen === 'landing' && (

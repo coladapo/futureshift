@@ -95,23 +95,6 @@ const InputScreen = ({ onAnalyze }) => {
                 className="w-full h-64 glass-input resize-none"
                 disabled={isAnalyzing}
               />
-
-              {/* Sample Pills - Only show when textarea is empty */}
-              {!background && (
-                <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 items-center">
-                  <span className="text-xs text-gray-500">Or try a sample:</span>
-                  {samplePersonas.map((persona, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleLoadSample(index)}
-                      className="px-3 py-1 text-xs rounded-full bg-white bg-opacity-5 hover:bg-opacity-10 border border-gray-700 text-gray-300 hover:text-white transition-all"
-                      disabled={isAnalyzing}
-                    >
-                      {persona.name}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Character Counter */}

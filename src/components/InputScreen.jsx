@@ -213,25 +213,6 @@ const InputScreen = ({ onAnalyze }) => {
             </span>
           </div>
         </div>
-
-        {/* Benefits */}
-        <div className="mt-8 grid md:grid-cols-3 gap-4 text-center">
-          <div className="text-sm text-gray-400">
-            <div className="text-2xl mb-1">⚡</div>
-            <div className="font-medium text-white">Fast Analysis</div>
-            <div>Results in 20-30 seconds</div>
-          </div>
-          <div className="text-sm text-gray-400">
-            <div className="text-2xl mb-1">🔒</div>
-            <div className="font-medium text-white">Private</div>
-            <div>Your data isn't stored</div>
-          </div>
-          <div className="text-sm text-gray-400">
-            <div className="text-2xl mb-1">🎯</div>
-            <div className="font-medium text-white">Personalized</div>
-            <div>Tailored to your background</div>
-          </div>
-        </div>
       </div>
     </div>
   );

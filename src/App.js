@@ -60,6 +60,11 @@ function App() {
         setUser(null);
         setScreen('landing');
         hasMigrated.current = false;
+
+        // Wait for toast to show, then reload
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
       }
     });
 
@@ -102,32 +107,26 @@ function App() {
   const handleSignOut = async () => {
     console.log('🚪 Signing out...');
     try {
-      // Check if there's an active session
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (session) {
-        // Session exists, sign out normally
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          console.error('❌ Sign out error:', error);
+      // Sign out from Supabase (this will trigger SIGNED_OUT event)
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('❌ Sign out error:', error);
+        // If error is "Auth session missing", it's already signed out
+        if (!error.message.includes('session missing')) {
           throw error;
         }
-      } else {
-        // No active session, just clear local state
-        console.log('ℹ️ No active session, clearing local state');
       }
 
       console.log('✅ Signed out successfully');
-      // Clear state and reload
-      setUser(null);
-      setScreen('landing');
-      window.location.reload();
+      // Don't reload - let the SIGNED_OUT event handler do it
+      // This prevents race conditions
     } catch (error) {
       console.error('❌ Sign out failed:', error);
-      // Even if sign out fails, clear local state and reload
+      // Force clear and reload as fallback
       setUser(null);
       setScreen('landing');
-      window.location.reload();
+      localStorage.clear(); // Clear all localStorage
+      window.location.href = '/'; // Hard redirect to root
     }
   };
 

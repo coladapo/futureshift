@@ -6,6 +6,7 @@ import LoadingAnimation from './components/LoadingAnimation';
 import ProgressiveResults from './components/ProgressiveResults';
 import AuthModal from './components/AuthModal';
 import AnalysisHistory from './components/AnalysisHistory';
+import Toast from './components/Toast';
 import { useClaudeAnalysis } from './hooks/useClaudeAnalysis';
 import { supabase } from './services/supabaseClient';
 import { migrateAnonymousData, hasAnonymousData } from './services/dataMigration';
@@ -16,8 +17,13 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [toast, setToast] = useState(null);
   const { analyze, results, error, loadResults, progress } = useClaudeAnalysis();
   const hasMigrated = useRef(false); // Track if we've already migrated
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
   // Check for existing session on mount
   useEffect(() => {
@@ -32,22 +38,28 @@ function App() {
       console.log('🔔 Auth state changed:', event, session?.user?.id || 'no user');
       setUser(session?.user ?? null);
 
+      // Handle sign in
+      if (event === 'SIGNED_IN') {
+        showToast('Welcome back! 👋', 'success');
+
+        // Migrate anonymous data (for OAuth and email confirmation)
+        if (session?.user && !hasMigrated.current && hasAnonymousData()) {
+          console.log('🔄 OAuth sign-in detected - migrating anonymous data');
+          hasMigrated.current = true;
+          // Run migration in background - don't block UI
+          migrateAnonymousData(session.user.id).catch(err => {
+            console.error('Migration failed:', err);
+          });
+        }
+      }
+
       // Handle sign out
       if (event === 'SIGNED_OUT') {
         console.log('👋 User signed out, resetting app state');
+        showToast('Signed out successfully', 'success');
         setUser(null);
         setScreen('landing');
         hasMigrated.current = false;
-      }
-
-      // Migrate anonymous data on sign-in (for OAuth and email confirmation)
-      if (event === 'SIGNED_IN' && session?.user && !hasMigrated.current && hasAnonymousData()) {
-        console.log('🔄 OAuth sign-in detected - migrating anonymous data');
-        hasMigrated.current = true;
-        // Run migration in background - don't block UI
-        migrateAnonymousData(session.user.id).catch(err => {
-          console.error('Migration failed:', err);
-        });
       }
     });
 
@@ -256,6 +268,15 @@ function App() {
         <AnalysisHistory
           onLoadAnalysis={handleLoadAnalysis}
           onClose={() => setShowHistory(false)}
+        />
+      )}
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

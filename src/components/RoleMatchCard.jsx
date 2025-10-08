@@ -57,14 +57,18 @@ const RoleMatchCard = ({ match, rank, analysisId }) => {
           <span>💪</span> Your Transferable Skills
         </h4>
         <div className="flex flex-wrap gap-2">
-          {match.transferableSkills.map((skill) => (
-            <span
-              key={skill}
-              className="glass-badge bg-gray-800 bg-opacity-50 text-gray-300"
-            >
-              {skill}
-            </span>
-          ))}
+          {match.transferableSkills.map((skill, index) => {
+            // Handle both string and object formats
+            const skillName = typeof skill === 'string' ? skill : skill.skill || skill.name || JSON.stringify(skill);
+            return (
+              <span
+                key={index}
+                className="glass-badge bg-gray-800 bg-opacity-50 text-gray-300"
+              >
+                {skillName}
+              </span>
+            );
+          })}
         </div>
       </div>
 
